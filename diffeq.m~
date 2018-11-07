@@ -1,0 +1,4 @@
+tspan = [0 20];
+I_01 = [0; 240];
+[t, I] = ode45(@current_ode, tspan, I_01)
+plot(t, I(:,))
