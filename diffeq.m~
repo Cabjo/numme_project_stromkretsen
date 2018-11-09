@@ -1,4 +1,11 @@
-tspan = [0 20];
+tspan = [0 0.01];
 I_01 = [0; 240];
-[t, I] = ode45(@current_ode, tspan, I_01)
-plot(t, I(:,))
+N = 100;
+[tkr,Itkr] = RK4(@current_ode, tspan, N, I_01);
+options = odeset('RelTol',1e-10);
+[t, I] = ode45(@current_ode, tspan, I_01, options);
+
+figure(1)
+plot(t, I(:,1),'-o', t, I(:,2), '-o')
+figure(2)
+plot(tkr, I(1,:),'-o')
