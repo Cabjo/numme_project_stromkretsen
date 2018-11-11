@@ -2,38 +2,45 @@
 format long
 tspan = [0 0.01];
 I_0 = [0 0 0; 240 1200 2400];
-I_01 = [0; 240];
-I_02 = [0; 1200];
-I_03 = [0; 2400];
 N = 10000;
-Irk_max = [];
-I_max = [];
 
-for i = 1:3
-[trk,Irk] = RK4(@current_ode, tspan, N, I_0(:,i));
-options = odeset('RelTol',1e-10);
-% rk_start
-% rk_next
-% while abs(rk_start - rk_next) > 1e-10
-[t, I] = ode45(@current_ode, tspan, I_0(:,i), options);
-Irk_max = [Irk_max max(Irk)];
-I_max = [I_max max(I(2,:))];
-% end
-figure(i)
-subplot(2,1,1), plot(t, I(:,1),'-', t, I(:,2), '-')
-legend('y = 0', 'ode45', 'Location','NorthEastOutside')
-subplot(2,1,2),plot(trk, Irk(1,:),'-', t, I(:,2), '-')
-legend('y = 0', 'Runge-Kutta 4', 'Location','NorthEastOutside')
+Irk_max = [];
+Irk_idx = [];
+I_max = [];
+I_idx = [];
+
+for i = 1:1
+
+    % ODE45 approximation
+    % t is the times
+    % I is the matrix containing I(t) and I'(t)
+    options = odeset('RelTol',1e-10);
+    [t, I] = ode45(@current_ode, tspan, I_0(:,i), options);
+        
+    [val, idx] = max(I(5:end,2));
+    I_max = [I_max val];
+    I_idx = [I_idx, idx];
+    
+    % Runge-Kutta approximation
+    % trk is the times
+    % Irk is the matrix containing Irk(trk) and Irk'(trk)
+    [trk,Irk] = RK4(@current_ode, tspan, N, I_0(:,i));
+    
+    [val_rk, idx_rk] = max(Irk(2,2:end)); % look at valuse of I from index 2 to end (index 1 gives max...)
+    Irk_max = [Irk_max val_rk];
+    Irk_idx = [Irk_idx, idx_rk];
+    
+    figure(i)
+    subplot(2,1,1), plot(t, I(:,1),'-', t, I(:,2), '-')
+    legend('y = 0', 'ode45', 'Location','NorthEastOutside')
+    subplot(2,1,2),plot(trk, Irk(1,:),'-', t, I(:,2), '-')
+    legend('y = 0', 'Runge-Kutta 4', 'Location','NorthEastOutside')
 end 
 
-% I_max
-% Irk_max
+% get index for these (we need to take t(index))
+I_max
+I_idx
 
-% [trk,Irk] = RK4(@current_ode, tspan, N, I_01);
-% options = odeset('RelTol',1e-10);
-% [t, I] = ode45(@current_ode, tspan, I_01, options);
-% 
-% figure(1)
-% plot(t, I(:,1),'-o', t, I(:,2), '-o')
-% figure(2)
-% plot(trk, Irk(1,:),'-o')
+Irk_max
+Irk_idx
+
