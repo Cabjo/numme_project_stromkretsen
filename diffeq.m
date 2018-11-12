@@ -2,7 +2,7 @@
 format long
 tspan = [0 0.01];
 I_0 = [0 0 0; 240 1200 2400];
-N = 10000;
+N = 100000;
 
 Irk_max = [];
 Irk_idx = [];
@@ -14,7 +14,7 @@ for i = 1:1
     % ODE45 approximation
     % t is the times
     % I is the matrix containing I(t) and I'(t)
-    options = odeset('RelTol',1e-10);
+    options = odeset('RelTol',1e-9);
     [t, I] = ode45(@current_ode, tspan, I_0(:,i), options);
         
     [val, idx] = max(I(5:end,2));
@@ -38,9 +38,26 @@ for i = 1:1
 end 
 
 % get index for these (we need to take t(index))
-I_max
-I_idx
+% I_max
+% I_idx
+% 
+% Irk_max
+% Irk_idx
 
-Irk_max
-Irk_idx
 
+k = 1;
+T = t(I_idx);
+t_period = t(1:I_idx);
+f = I(1:I_idx,2);
+w = 2*pi/T;
+n = 10;
+
+a = 0;
+a_next = 1;
+
+while abs(a-a_next) > 1e-5
+    a = a_next;
+    n = n/2;
+    S = integral(f, t_period, n, k, w);
+    a_next = (2/T)*S
+end

@@ -1,0 +1,15 @@
+function S = integral(f, t, n, k, w)
+    max_idx = length(t);
+    h = floor(max_idx/n);
+    
+    t_n = zeros();
+    f_n = zeros();
+    for i = 1:n
+        i_time = i*h;
+        t_n(i) = t(i_time);
+        f_n(i) = f(i_time);
+    end
+    
+    S = h/2*(f_n(1)*sin(k*t_n(1)*w)+f_n(end)*sin(k*t_n(end)*w)+2*sum(f_n(2:end-1)*sin(k*t_n(2:end)*w)));
+
+end
