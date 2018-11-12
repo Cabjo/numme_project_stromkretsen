@@ -49,8 +49,8 @@ k = 1;
 T = t(I_idx);
 t_period = t(1:I_idx);
 w = 2*pi/T;
-n = 159;
-max_idx = length(t_period)
+n = 8;
+max_idx = length(t_period);
 a = 0; 
 a_next = 1;
 f = I(1:I_idx,2);
@@ -58,10 +58,10 @@ f = I(1:I_idx,2);
 
 %while abs(a-a_next) > 1e-2
     a = a_next;
-    n = n*2
-    h = floor(max_idx/n)
-    S = integral(f, t_period, h, k)
-    a_next = (2/T)*S;
+    n = n*2;
+    h = floor(max_idx/n);
+    S = integral(f, t_period, h, k);
+    a_next = (2/T)*S
     if h == 0
         % attempt to break the loop :( 
         a = a_next;
