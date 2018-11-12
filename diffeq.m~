@@ -45,19 +45,38 @@ end
 % Irk_idx
 
 
-k = 3;
+k = 1;
 T = t(I_idx);
 t_period = t(1:I_idx);
 w = 2*pi/T;
-n = 10;
+n = 2;
 a = 0;
 a_next = 1;
 f = I(1:I_idx,2);
 
 
-while abs(a-a_next) > 1e-5
+% max_idx = length(t_period);
+% h = floor(max_idx/n);
+% t_n = zeros();
+%     f_n = zeros();
+%     t_n(1) = 1;
+%     for i = 2:n+1
+%         i_time = t_n(i-1) + h;
+%         t_n(i) = i_time;
+%         if i_time < max_idx
+%             f_n(i) = f(i_time);
+%         else 
+%             f_n(i) = f(max_idx);
+%         end
+%     end
+% sinus = sin(k*t_n(1:end)*w);
+% S = h/2*(f_n(1)*sinus(1)+f_n(end)*sinus(end)+2*sum(f_n(2:end-1).*sinus(2:end-1)))
+% S1 = integral(f, t_period, n/2/2/2/2, k, w)
+
+
+while abs(a-a_next) > 1e-2
     a = a_next;
-    n = n/2;
+    n = n*2;
     S = integral(f, t_period, n, k, w);
     a_next = (2/T)*S
 end
