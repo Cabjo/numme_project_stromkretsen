@@ -7,12 +7,14 @@ N = 100000;
 Irk_max = [];
 Irk_idx = [];
 I_max = [];
-I_idx = [];
+Ir_idx = [];
 
 T = [];
+T_tot = [];
+T_tot_idx = [];
 T_idx = [];
 
-for i = 1:3
+for i = 1:1
   
 
     % ODE45 approximation
@@ -21,13 +23,17 @@ for i = 1:3
     options = odeset('RelTol',1e-9);
     [t, I] = ode45(@current_ode, tspan, I_0(:,i), options);
     
-    j = 1;
-    I_half = zeros();
-    while I(j,1) >= 0
-        I_half(j)= I(j,1);
-        j = j+1;
-    end
-    [I_max, I_idx] = max(I_half);
+%     j = 1;
+%     I_half = zeros();
+%     while I(j,1) >= 0
+%         I_half(j)= I(j,1);
+%         j = j+1;
+%     end
+%     [I_max, I_idx] = max(I_half);
+%     I_idx
+%     I_index_test = I_idx*3
+%     I_abs = abs(I(I_index_test:end,1))
+%     [I_min, I_idx_min] = min(I_abs)
 %     t_max_idx = length(I_half);
 %     figure(i)
 %     plot(t(1:t_max_idx), I_half);
@@ -47,6 +53,18 @@ for i = 1:3
     Irk_max = [Irk_max val_rk];
     Irk_idx = [Irk_idx, idx_rk];
     
+    j = 1;
+    Irk_half = zeros();
+    while Irk(j,1) >= 0
+        Irk_half(j)= Irk(j,1);
+        j = j+1;
+    end
+    [Irk_max, Irk_idx] = max(Irk_half);
+    Irk_idx
+    Irk_index_test = Irk_idx*3
+    Irk_abs = abs(Irk(Irk_index_test:end,1))
+    [Irk_min, Irk_idx_min] = min(Irk_abs)
+    
     I_zero = [0 0];
     figure(i+3)
     subplot(2,1,1), plot(t, I(:,1),'-', tspan, I_zero, '-')
@@ -56,6 +74,10 @@ for i = 1:3
     
     T = [T t(I_idx)];
     T_idx = [T_idx I_idx];
+    
+    T_tot = [T_tot, t(Irk_idx_min)]
+    T_tot_idx = [T_tot_idx, Irk_idx_min]
+
 %     Trk = trk(Irk_idx);
 end 
 

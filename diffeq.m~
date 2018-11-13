@@ -9,74 +9,84 @@ Irk_idx = [];
 I_max = [];
 I_idx = [];
 
-for i = 1:1
+T = [];
+T_idx = [];
+
+for i = 1:3
+  
 
     % ODE45 approximation
     % t is the times
     % I is the matrix containing I(t) and I'(t)
     options = odeset('RelTol',1e-9);
     [t, I] = ode45(@current_ode, tspan, I_0(:,i), options);
-        
-    [val, idx] = max(I(5:end,2));
-    I_max = [I_max val];
-    I_idx = [I_idx, idx];
+    
+    j = 1;
+    I_half = zeros();
+    while I(j,1) >= 0
+        I_half(j)= I(j,1);
+        j = j+1;
+    end
+    [I_max, I_idx] = max(I_half);
+%     t_max_idx = length(I_half);
+%     figure(i)
+%     plot(t(1:t_max_idx), I_half);
+    
+
+%     
+%     [val, idx] = max(I(5:end,1)); 
+%     I_max = [I_max val];
+%     I_idx = [I_idx, idx];
     
     % Runge-Kutta approximation
     % trk is the times
     % Irk is the matrix containing Irk(trk) and Irk'(trk)
     [trk,Irk] = RK4(@current_ode, tspan, N, I_0(:,i));
     
-    [val_rk, idx_rk] = max(Irk(2,2:end)); % look at valuse of I from index 2 to end (index 1 gives max...)
-    Irk_max = [Irk_max val_rk];
-    Irk_idx = [Irk_idx, idx_rk];
+%     [val_rk, idx_rk] = max(Irk(1,2:end)); % look at valuse of I from index 2 to end (index 1 gives max...)
+%     Irk_max = [Irk_max val_rk];
+%     Irk_idx = [Irk_idx, idx_rk];
+%     
+    I_zero = [0 0];
+    figure(i+3)
+    subplot(2,1,1), plot(t, I(:,1),'-', tspan, I_zero, '-')
+    legend('ode45', 'y = 0', 'Location','NorthEastOutside')
+    subplot(2,1,2),plot(trk, Irk(1,:),'-', tspan, I_zero, '-')
+    legend('Runge-Kutta 4', 'y = 0', 'Location','NorthEastOutside')
     
-    figure(i)
-    subplot(2,1,1), plot(t, I(:,1),'-', t, I(:,2), '-')
-    legend('y = 0', 'ode45', 'Location','NorthEastOutside')
-    subplot(2,1,2),plot(trk, Irk(1,:),'-', t, I(:,2), '-')
-    legend('y = 0', 'Runge-Kutta 4', 'Location','NorthEastOutside')
+    T = [T t(I_idx)];
+    T_idx = [T_idx I_idx];
+%     Trk = trk(Irk_idx);
 end 
 
-% get index for these (we need to take t(index))
+%get index for these (we need to take t(index))
 % I_max
 % I_idx
 % 
 % Irk_max
 % Irk_idx
 
-
-k = 1;
-T = t(I_idx);
-t_period = t(1:I_idx);
-w = 2*pi/T;
-n = 2;
-a = 0;
+i = 1;
+k = 2;
+T = T*4;              % times 4 due to symmetry
+T_idx = T_idx*4;
+t_period = t(1:T_idx(i));
+w = 2*pi/T(i);
+n = 8;
+max_idx = length(t_period);
+a = 0; 
 a_next = 1;
-f = I(1:I_idx,2);
+f = I(1:T_idx(i));
 
 
-% max_idx = length(t_period);
-% h = floor(max_idx/n);
-% t_n = zeros();
-%     f_n = zeros();
-%     t_n(1) = 1;
-%     for i = 2:n+1
-%         i_time = t_n(i-1) + h;
-%         t_n(i) = i_time;
-%         if i_time < max_idx
-%             f_n(i) = f(i_time);
-%         else 
-%             f_n(i) = f(max_idx);
-%         end
-%     end
-% sinus = sin(k*t_n(1:end)*w);
-% S = h/2*(f_n(1)*sinus(1)+f_n(end)*sinus(end)+2*sum(f_n(2:end-1).*sinus(2:end-1)))
-% S1 = integral(f, t_period, n/2/2/2/2, k, w)
-
-
-while abs(a-a_next) > 1e-2
+%while abs(a-a_next) > 1e-2
     a = a_next;
     n = n*2;
-    S = integral(f, t_period, n, k, w);
-    a_next = (2/T)*S
-end
+    h = floor(max_idx/n);
+    S = integral(f, t_period, h, k);
+    a_next = (2/T(i))*S
+    if h == 0
+        % attempt to break the loop :( 
+        a = a_next;
+    end
+%end

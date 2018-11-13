@@ -10,6 +10,8 @@ I_max = [];
 I_idx = [];
 
 T = [];
+T_tot = [];
+T_tot_idx = [];
 T_idx = [];
 
 for i = 1:3
@@ -21,13 +23,17 @@ for i = 1:3
     options = odeset('RelTol',1e-9);
     [t, I] = ode45(@current_ode, tspan, I_0(:,i), options);
     
-    j = 1;
-    I_half = zeros();
-    while I(j,1) >= 0
-        I_half(j)= I(j,1);
-        j = j+1;
-    end
-    [I_max, I_idx] = max(I_half);
+%     j = 1;
+%     I_half = zeros();
+%     while I(j,1) >= 0
+%         I_half(j)= I(j,1);
+%         j = j+1;
+%     end
+%     [I_max, I_idx] = max(I_half);
+%     I_idx
+%     I_index_test = I_idx*3
+%     I_abs = abs(I(I_index_test:end,1))
+%     [I_min, I_idx_min] = min(I_abs)
 %     t_max_idx = length(I_half);
 %     figure(i)
 %     plot(t(1:t_max_idx), I_half);
@@ -47,6 +53,17 @@ for i = 1:3
     Irk_max = [Irk_max val_rk];
     Irk_idx = [Irk_idx, idx_rk];
     
+    j = 1;
+    Irk_half = zeros();
+    while Irk(1,j) >= 0
+        Irk_half(j)= Irk(1,j);
+        j = j+1;
+    end
+    [Irk_max, Irk_idx] = max(Irk_half);
+    Irk_index_test = Irk_idx*3;
+    Irk_abs = abs(Irk(1,Irk_index_test:end));
+    [Irk_min, Irk_idx_min] = min(Irk_abs);
+    
     I_zero = [0 0];
     figure(i+3)
     subplot(2,1,1), plot(t, I(:,1),'-', tspan, I_zero, '-')
@@ -56,6 +73,10 @@ for i = 1:3
     
     T = [T t(I_idx)];
     T_idx = [T_idx I_idx];
+    
+    T_tot = [T_tot, trk(Irk_idx_min)]
+    T_tot_idx = [T_tot_idx, Irk_idx_min]
+
 %     Trk = trk(Irk_idx);
 end 
 
@@ -68,14 +89,14 @@ end
 i = 1;
 k = 2;
 T = T*4;              % times 4 due to symmetry
-T_idx = T_idx*4;
-t_period = t(1:T_idx(i));
-w = 2*pi/T(i);
+%T_idx = T_idx*4;
+t_period = trk(1:T_tot_idx(i));
+w = 2*pi/T_tot(i);
 n = 8;
 max_idx = length(t_period);
 a = 0; 
 a_next = 1;
-f = I(1:T_idx(i));
+f = Irk(1:T_tot_idx(i));
 
 
 %while abs(a-a_next) > 1e-2
@@ -83,7 +104,7 @@ f = I(1:T_idx(i));
     n = n*2;
     h = floor(max_idx/n);
     S = integral(f, t_period, h, k);
-    a_next = (2/T(i))*S
+    a_next = (2/T_tot(i))*S
     if h == 0
         % attempt to break the loop :( 
         a = a_next;
