@@ -1,0 +1,4 @@
+function S = integral_2(I_period, t_period, k)
+
+
+end
